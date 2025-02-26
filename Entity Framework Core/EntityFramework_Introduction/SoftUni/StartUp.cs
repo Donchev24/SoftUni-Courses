@@ -10,13 +10,14 @@ namespace SoftUni
             SoftUniContext dbContext = new SoftUniContext();
             dbContext.Database.EnsureCreated();
 
-            string result = GetEmployeesFullInformation(dbContext);
+            string result = GetEmployeesWithSalaryOver50000(dbContext);
             Console.WriteLine(result);
         }
 
         public static string GetEmployeesFullInformation(SoftUniContext context)
         {
-            var employees = context.Employees
+            var employees = context
+                .Employees
                 .OrderBy(e => e.EmployeeId)
                 .Select(e => new
                 {
@@ -33,6 +34,29 @@ namespace SoftUni
             foreach (var e in employees)
             {
                 sb.AppendLine($"{e.FirstName} {e.LastName} {e.MiddleName} {e.JobTitle} {e.Salary.ToString("F2")}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        public static string GetEmployeesWithSalaryOver50000(SoftUniContext context)
+        {
+            var employees = context
+                .Employees
+                .Select(e => new
+                {
+                    e.FirstName,
+                    e.Salary
+                })
+                .Where(e => e.Salary > 50000)
+                .OrderBy(e => e.FirstName)
+                .ToArray();
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach(var e in employees)
+            {
+                sb.AppendLine($"{e.FirstName} - {e.Salary.ToString("F2")}");
             }
 
             return sb.ToString().TrimEnd();
