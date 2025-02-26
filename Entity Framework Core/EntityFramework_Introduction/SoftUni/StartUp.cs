@@ -11,7 +11,7 @@ namespace SoftUni
             SoftUniContext dbContext = new SoftUniContext();
             dbContext.Database.EnsureCreated();
 
-            string result = GetEmployeesFromResearchAndDevelopment(dbContext);
+            string result = AddNewAddressToEmployee(dbContext);
             Console.WriteLine(result);
         }
 
@@ -89,5 +89,34 @@ namespace SoftUni
             return sb.ToString().TrimEnd();
         }
 
+        public static string AddNewAddressToEmployee(SoftUniContext context)
+        {
+            const string newAddressText = "Vitoshka 15";
+            const int newAddressTownId = 4;
+
+            Address newAddress = new Address()
+            {
+                AddressText = newAddressText,
+                TownId = newAddressTownId
+            };
+
+            Employee employeeNakov = context
+                .Employees
+                .First(e => e.LastName.Equals("Nakov"));
+
+            employeeNakov.Address = newAddress;
+
+            context.SaveChanges();
+
+            string?[] addresses = context
+                .Employees
+                .Where(e => e.AddressId.HasValue)
+                .OrderByDescending(e => e.AddressId)
+                .Select(e => e.Address!.AddressText)
+                .Take(10)
+                .ToArray();
+
+            return string.Join(Environment.NewLine, addresses);
+        }
     }
 }
