@@ -11,7 +11,7 @@ namespace SoftUni
             SoftUniContext dbContext = new SoftUniContext();
             dbContext.Database.EnsureCreated();
 
-            string result = AddNewAddressToEmployee(dbContext);
+            string result = GetEmployeesInPeriod(dbContext);
             Console.WriteLine(result);
         }
 
@@ -117,6 +117,53 @@ namespace SoftUni
                 .ToArray();
 
             return string.Join(Environment.NewLine, addresses);
+        }
+
+
+        public static string GetEmployeesInPeriod(SoftUniContext context)
+        {
+            var employees = context
+                .Employees
+                .Select(e => new
+                {
+                    e.FirstName,
+                    e.LastName,
+                    ManagerFirstName = e.Manager.FirstName,
+                    ManagerLastName = e.Manager.LastName,
+                    Projects = e.EmployeesProjects
+                            .Select(ep => ep.Project)
+                            .Where(p => p.StartDate.Year >= 2001
+                                        && p.StartDate.Year <= 2003)
+                            .Select(p => new
+                            {
+                                ProjectName = p.Name,
+                                p.StartDate,
+                                p.EndDate
+                            })
+                            .ToArray()
+                })
+                .Take(10)
+                .ToArray();
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var e in employees)
+            {
+                sb.AppendLine($"{e.FirstName} {e.LastName} - Manager: {e.ManagerFirstName} {e.ManagerLastName}");
+                if (e.Projects.Length > 0)
+                {
+                    foreach (var p in e.Projects)
+                    {
+                        string startDate = p.StartDate.ToString("M/d/yyyy h:mm:ss tt");
+                        string endDate = p.EndDate.HasValue ? p.EndDate.Value.ToString("M/d/yyyy h:mm:ss tt")
+                                                            : "not finished";
+                        sb.AppendLine($"--{p.ProjectName} - {startDate} - {endDate}");
+                    }
+                }
+            }
+
+            return sb.ToString().TrimEnd();
+                
         }
     }
 }
