@@ -165,5 +165,34 @@ namespace SoftUni
             return sb.ToString().TrimEnd();
                 
         }
+
+        public static string DeleteProjectById(SoftUniContext context)
+        {
+            const int deleteProjectId = 2;
+
+            IEnumerable<EmployeeProject> employeeProjectsDelete = context
+                .EmployeesProjects
+                .Where(ep => ep.ProjectId == deleteProjectId)
+                .ToArray();
+
+            context.EmployeesProjects.RemoveRange(employeeProjectsDelete);
+
+            Project? deleteProject = context
+                .Projects
+                .Find(deleteProjectId);
+
+            if (deleteProject != null)
+            {
+                context.Projects.Remove(deleteProject);
+            }
+
+            string[] projectNames = context
+                .Projects
+                .Select(p => p.Name)
+                .Take(10)
+                .ToArray();
+
+            return string.Join(Environment.NewLine, projectNames);
+        }
     }
 }
