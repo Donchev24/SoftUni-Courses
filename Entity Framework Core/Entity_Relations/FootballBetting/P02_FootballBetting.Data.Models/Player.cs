@@ -20,8 +20,8 @@ namespace P02_FootballBetting.Data.Models
         public bool IsInjured { get; set; }
 
         [ForeignKey(nameof(Team))]
-        public int? TeamId { get; set; }
-        public virtual Team? Team { get; set; }
+        public int TeamId { get; set; }
+        public virtual Team Team { get; set; }
 
         [Required]
         [ForeignKey(nameof(Position))]
@@ -33,7 +33,7 @@ namespace P02_FootballBetting.Data.Models
         public int TownId { get; set; }
         public virtual Town Town { get; set; } = null!;
 
-        public virtual ICollection<PlayerStatistic> Games { get; set; }
+        public virtual ICollection<PlayerStatistic> PlayersStatistics { get; set; }
           = new HashSet<PlayerStatistic>();
     }
 }

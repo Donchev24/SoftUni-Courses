@@ -19,7 +19,7 @@ namespace P02_FootballBetting.Data.Models
         public DateTime DateTime { get; set; }
 
         [Required]
-        [ForeignKey(nameof(User))]
+        [ForeignKey(nameof(User))] 
         public int UserId { get; set; }
         public virtual User User { get; set; } = null!;
     }

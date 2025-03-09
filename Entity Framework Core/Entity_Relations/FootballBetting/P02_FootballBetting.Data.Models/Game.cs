@@ -10,10 +10,10 @@ namespace P02_FootballBetting.Data.Models
         public int GameId { get; set; }
 
         [Required]
-        public short HomeTeamGoals { get; set; }
+        public int HomeTeamGoals { get; set; }
 
         [Required]
-        public short AwayTeamGoals { get; set; }
+        public int AwayTeamGoals { get; set; }
 
         [Required]
         public decimal HomeTeamBetRate { get; set; }
@@ -24,7 +24,7 @@ namespace P02_FootballBetting.Data.Models
         [Required]
         public decimal DrawBetRate { get; set; }
 
-        public DateTime? DateTime { get; set; }
+        public DateTime DateTime { get; set; }
 
         [MaxLength(GameResultMaxLength)]
         public string? Result { get; set; }
@@ -40,7 +40,7 @@ namespace P02_FootballBetting.Data.Models
 
         public virtual Team AwayTeam { get; set; } = null!;
 
-        public virtual ICollection<PlayerStatistic> Players { get; set; }
+        public virtual ICollection<PlayerStatistic> PlayersStatistics { get; set; }
          = new HashSet<PlayerStatistic>();
 
         public virtual ICollection<Bet> Bets { get; set; }
