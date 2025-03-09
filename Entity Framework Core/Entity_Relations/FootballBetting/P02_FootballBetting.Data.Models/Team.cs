@@ -11,7 +11,7 @@ namespace P02_FootballBetting.Data.Models
 
         [Required]
         [MaxLength(TeamNameMaxLength)]
-        public string TeamName { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
         [MaxLength(LogoUrlMaxLength)]
         public string? LogoUrl { get; set; }

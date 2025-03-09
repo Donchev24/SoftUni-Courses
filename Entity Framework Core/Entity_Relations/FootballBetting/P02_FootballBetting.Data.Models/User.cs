@@ -12,7 +12,7 @@ namespace P02_FootballBetting.Data.Models
 
         [Required]
         [MaxLength(UserUsernameMaxLength)]
-        public string Username { get; set; }
+        public string Username { get; set; } = null!;
 
         [Required]
         [MaxLength(UserNameMaxLength)]

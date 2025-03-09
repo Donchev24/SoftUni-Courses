@@ -11,7 +11,7 @@ namespace P02_FootballBetting.Data.Models
 
         [Required]
         [MaxLength(TownNameMaxLength)]
-        public string TownName { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
         public virtual ICollection<Team> Teams { get; set; }
           = new HashSet<Team>();

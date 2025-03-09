@@ -13,16 +13,16 @@ namespace P02_FootballBetting.Data
         {
         }
 
-        public virtual DbSet<Bet> Bets { get; set; }
-        public DbSet<Color> Colors { get; set; }
-        public DbSet<Country> Countries { get; set; }
-        public DbSet<Game> Games { get; set; }
-        public DbSet<Player> Players { get; set; }
-        public DbSet<PlayerStatistic> PlayersStatistics { get; set; }
-        public DbSet<Position> Positions { get; set; }
-        public DbSet<Team> Teams { get; set; }
-        public DbSet<Town> Towns { get; set; }
-        public DbSet<User> Users { get; set; }
+        public virtual DbSet<Bet>? Bets { get; set; }
+        public DbSet<Color>? Colors { get; set; }
+        public DbSet<Country>? Countries { get; set; }
+        public DbSet<Game>? Games { get; set; }
+        public DbSet<Player>? Players { get; set; }
+        public DbSet<PlayerStatistic>? PlayersStatistics { get; set; }
+        public DbSet<Position>? Positions { get; set; }
+        public DbSet<Team>? Teams { get; set; }
+        public DbSet<Town>? Towns { get; set; }
+        public DbSet<User>? Users { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -71,6 +71,23 @@ namespace P02_FootballBetting.Data
                 .WithMany(t => t.AwayGames)
                 .HasForeignKey(g => g.AwayTeamId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            ////player - town unexpected throw
+            modelBuilder
+                .Entity<Player>()
+                .HasOne(p => p.Town)
+                .WithMany(t => t.Players)
+                .HasForeignKey(t => t.TownId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            ////bet - user unexpected throw
+            modelBuilder
+                .Entity<Bet>()
+                .HasOne(b => b.User)
+                .WithMany(u => u.Bets)
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
 
     }

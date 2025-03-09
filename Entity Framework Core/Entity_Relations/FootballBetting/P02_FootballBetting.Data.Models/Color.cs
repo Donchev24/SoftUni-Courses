@@ -11,7 +11,7 @@ namespace P02_FootballBetting.Data.Models
 
         [Required]
         [MaxLength(ColorNameMaxLength)]
-        public string ColorName { get; set; } = null!;
+        public string Name { get; set; } = null!;
 
         [InverseProperty(nameof(Team.PrimaryKitColor))]
         public virtual ICollection<Team> PrimaryKitTeams { get; set; }

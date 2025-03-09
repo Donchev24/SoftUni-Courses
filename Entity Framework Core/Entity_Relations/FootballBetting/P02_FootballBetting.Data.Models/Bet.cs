@@ -22,5 +22,10 @@ namespace P02_FootballBetting.Data.Models
         [ForeignKey(nameof(User))] 
         public int UserId { get; set; }
         public virtual User User { get; set; } = null!;
+
+        [Required]
+        [ForeignKey(nameof(Game))]
+        public int GameId { get; set; }
+        public Game Game { get; set; }
     }
 }
