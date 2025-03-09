@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using static P02_FootballBetting.Common.EntityValidationConstants.Color;
 
 namespace P02_FootballBetting.Data.Models
@@ -12,6 +13,12 @@ namespace P02_FootballBetting.Data.Models
         [MaxLength(ColorNameMaxLength)]
         public string ColorName { get; set; } = null!;
 
+        [InverseProperty(nameof(Team.PrimaryKitColor))]
+        public virtual ICollection<Team> PrimaryKitTeams { get; set; }
+          = new HashSet<Team>();
 
+        [InverseProperty(nameof(Team.SecondaryKitColor))]
+        public virtual ICollection<Team> SecondaryKitTeams { get; set; }
+          = new HashSet<Team>();
     }
 }

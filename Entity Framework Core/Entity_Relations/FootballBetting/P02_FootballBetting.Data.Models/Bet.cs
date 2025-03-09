@@ -1,5 +1,6 @@
 ﻿using P02_FootballBetting.Data.Models.Enumerations;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace P02_FootballBetting.Data.Models
 {
@@ -16,5 +17,10 @@ namespace P02_FootballBetting.Data.Models
 
         [Required]
         public DateTime DateTime { get; set; }
+
+        [Required]
+        [ForeignKey(nameof(User))]
+        public int UserId { get; set; }
+        public virtual User User { get; set; } = null!;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection.Metadata.Ecma335;
 using static P02_FootballBetting.Common.EntityValidationConstants.User;
 
@@ -27,6 +28,14 @@ namespace P02_FootballBetting.Data.Models
 
         [Required]
         public decimal Balance { get; set; }
+
+        [Required]
+        [ForeignKey(nameof(Game))]
+        public int GameId { get; set; }
+        public virtual Game Game { get; set; } = null!;
+
+        public virtual ICollection<Bet> Bets { get; set; }
+          = new HashSet<Bet>();
 
     }
 }
