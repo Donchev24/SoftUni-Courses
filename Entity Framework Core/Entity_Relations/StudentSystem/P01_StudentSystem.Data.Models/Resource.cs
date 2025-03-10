@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.AccessControl;
 using static P01_StudentSystem.Data.Common.Resource;
+using P01_StudentSystem.Data.Models.Enumerations;
 
 namespace P01_StudentSystem.Data.Models
 {

@@ -6,7 +6,7 @@ namespace P01_StudentSystem.Data
 {
     public class StudentSystemContext : DbContext
     {
-        protected StudentSystemContext()
+        public StudentSystemContext()
         {
         }
         public StudentSystemContext(DbContextOptions options) 
