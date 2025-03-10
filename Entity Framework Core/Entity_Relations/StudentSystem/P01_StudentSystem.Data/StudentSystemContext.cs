@@ -14,11 +14,11 @@ namespace P01_StudentSystem.Data
         {
         }
 
-        public virtual DbSet<Course> Course { get; set; }
-        public virtual DbSet<Homework> Homeworks { get; set; }
-        public virtual DbSet<Resource> Resources { get; set; }
-        public virtual DbSet<Student> Students { get; set; }
-        public virtual DbSet<StudentCourse> StudentsCourses { get; set; }
+        public virtual DbSet<Course>? Courses { get; set; }
+        public virtual DbSet<Homework>? Homeworks { get; set; }
+        public virtual DbSet<Resource>? Resources { get; set; }
+        public virtual DbSet<Student>? Students { get; set; }
+        public virtual DbSet<StudentCourse>? StudentsCourses { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -21,7 +21,7 @@ namespace P01_StudentSystem.Data.Models
         public DateTime? Birthday { get; set; }
 
 
-        public virtual ICollection<StudentCourse> Courses { get; set; }
+        public virtual ICollection<StudentCourse> StudentsCourses { get; set; }
           = new HashSet<StudentCourse>();
 
         public virtual ICollection<Homework> Homeworks { get; set; } 

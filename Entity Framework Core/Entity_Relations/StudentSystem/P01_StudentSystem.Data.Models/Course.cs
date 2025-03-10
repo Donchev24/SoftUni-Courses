@@ -25,7 +25,7 @@ namespace P01_StudentSystem.Data.Models
         public decimal Price { get; set; }
 
 
-        public virtual ICollection<StudentCourse> Students { get; set; }
+        public virtual ICollection<StudentCourse> StudentsCourses { get; set; }
             = new HashSet<StudentCourse>();
 
         public virtual ICollection<Homework> Homeworks { get; set; }
