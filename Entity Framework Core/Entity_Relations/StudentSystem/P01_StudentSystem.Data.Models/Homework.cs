@@ -20,5 +20,14 @@ namespace P01_StudentSystem.Data.Models
         public DateTime SubmissionTime { get; set; }
 
 
+        [ForeignKey(nameof(Student))]
+        public int StudentId { get; set; }
+        public virtual Student Student { get; set; } = null!;
+
+        [ForeignKey(nameof(Course))]
+        public int CourseId { get; set; }
+        public Course Course { get; set; } = null!;
+
+
     }
 }

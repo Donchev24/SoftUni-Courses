@@ -19,5 +19,9 @@ namespace P01_StudentSystem.Data.Models
         public string Url { get; set; } = null!;
 
         public ResourceType ResourceType { get; set; }
+
+        [ForeignKey(nameof(Course))]
+        public int CourseId { get; set; }
+        public Course Course { get; set; } = null!;
     }
 }
