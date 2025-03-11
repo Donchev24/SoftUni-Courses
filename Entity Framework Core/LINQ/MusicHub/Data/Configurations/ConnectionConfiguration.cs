@@ -1,6 +1,6 @@
-﻿namespace MusicHub.Data
+﻿namespace MusicHub.Data.Configurations
 {
-    public static class Configuration
+    public static class ConnectionConfiguration
     {
         public static string ConnectionString =
             @"Server=.;Database=MusicHub;Trusted_Connection=True";
