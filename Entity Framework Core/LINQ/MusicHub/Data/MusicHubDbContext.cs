@@ -1,6 +1,7 @@
 ﻿namespace MusicHub.Data
 {
     using Microsoft.EntityFrameworkCore;
+    using MusicHub.Data.Configurations;
 
     public class MusicHubDbContext : DbContext
     {
@@ -18,7 +19,7 @@
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder
-                    .UseSqlServer(Configuration.ConnectionString);
+                    .UseSqlServer(ConnectionConfiguration.ConnectionString);
             }
         }
 
