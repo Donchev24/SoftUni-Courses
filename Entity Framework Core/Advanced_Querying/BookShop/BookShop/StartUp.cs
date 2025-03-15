@@ -8,12 +8,10 @@
     {
         public static void Main()
         {
-            using var db = new BookShopContext();
-            DbInitializer.ResetDatabase(db);
+            using BookShopContext dbContext = new BookShopContext();
+            //DbInitializer.ResetDatabase(db);
 
-            string input = "miNor";
-
-            string result = GetBooksByAgeRestriction(db, input);
+            string result = GetGoldenBooks(dbContext);
             Console.WriteLine(result);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -29,7 +27,20 @@
 
             return $"{string.Join(Environment.NewLine, restrictedBooks)}";
         }
+
+        public static string GetGoldenBooks(BookShopContext context)
+        {
+            string[] goldenBooks = context
+                .Books
+                .Where(b => b.EditionType == EditionType.Gold
+                            && b.Copies < 5000)
+                .OrderBy (b => b.BookId)
+                .Select (b => b.Title)
+                .ToArray();
+
+            return string.Join(Environment.NewLine, goldenBooks);
+        }
     }
-}
+ }
 
 
