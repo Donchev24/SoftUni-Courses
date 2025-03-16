@@ -4,6 +4,8 @@
     using Data;
     using Initializer;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+    using System.Diagnostics.Metrics;
     using System.Text;
 
     public class StartUp
@@ -11,11 +13,11 @@
         public static void Main()
         {
             using BookShopContext dbContext = new BookShopContext();
-            //DbInitializer.ResetDatabase(db);
+            //DbInitializer.ResetDatabase(dbContext);
 
-            string input = Console.ReadLine();
+            string input = "12-04-1992";
 
-            string result = GetBooksByCategory(dbContext, input);
+            string result = GetBooksReleasedBefore(dbContext, input);
             Console.WriteLine(result);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -95,6 +97,36 @@
                 .ToArray();
 
             return string.Join(Environment.NewLine,booksByCategory);
+        }
+
+        public static string GetBooksReleasedBefore(BookShopContext context, string date)
+        {
+            DateTime.TryParse(date, out DateTime parsedDate);
+
+            var booksReleasedBefore = context
+                .Books
+                .Where(b => b.ReleaseDate.HasValue
+                         && b.ReleaseDate.Value.CompareTo(parsedDate) < 0)
+                .Select(b => new
+                {
+                    b.Title,
+                    b.ReleaseDate,
+                    b.EditionType,
+                    b.Price
+                })
+                .ToArray()
+                .OrderByDescending(b => b.ReleaseDate)
+                .ToArray();
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var book in booksReleasedBefore)
+            {
+                sb.AppendLine($"{book.Title} - {book.EditionType} - ${book.Price.ToString("F2")} - {book.ReleaseDate}");
+            }
+
+            
+            return sb.ToString().TrimEnd();
         }
     }
  }
