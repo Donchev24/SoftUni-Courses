@@ -12,7 +12,7 @@
             using BookShopContext dbContext = new BookShopContext();
             //DbInitializer.ResetDatabase(db);
 
-            string result = GetBooksByPrice(dbContext);
+            string result = GetBooksNotReleasedIn(dbContext, 2000);
             Console.WriteLine(result);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -63,6 +63,19 @@
             }
 
             return sb.ToString();
+        }
+
+        public static string GetBooksNotReleasedIn(BookShopContext context, int year)
+        {
+            var booksNotReleasedIn = context
+                .Books
+                .Where(b => b.ReleaseDate.HasValue
+                         && b.ReleaseDate.Value.Year != year)
+                .OrderBy(b => b.BookId)
+                .Select(b => b.Title)
+                .ToList();
+
+            return string.Join(Environment.NewLine, booksNotReleasedIn);
         }
     }
  }
