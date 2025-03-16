@@ -15,9 +15,11 @@
             using BookShopContext dbContext = new BookShopContext();
             //DbInitializer.ResetDatabase(dbContext);
 
-            string input = "12-04-1992";
+            //string input = "12-04-1992";
+            string input = "e";
 
-            string result = GetBooksReleasedBefore(dbContext, input);
+            //string result = GetBooksReleasedBefore(dbContext, input);
+            string result = GetAuthorNamesEndingIn(dbContext, input);
             Console.WriteLine(result);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -114,7 +116,6 @@
                     b.EditionType,
                     b.Price
                 })
-                .ToArray()
                 .OrderByDescending(b => b.ReleaseDate)
                 .ToArray();
 
@@ -122,10 +123,33 @@
 
             foreach (var book in booksReleasedBefore)
             {
-                sb.AppendLine($"{book.Title} - {book.EditionType} - ${book.Price.ToString("F2")} - {book.ReleaseDate}");
+                sb.AppendLine($"{book.Title} - {book.EditionType} - ${book.Price.ToString("F2")}");
+            }
+            
+            return sb.ToString().TrimEnd();
+        }
+
+        public static string GetAuthorNamesEndingIn(BookShopContext context, string input)
+        {
+            var selectedAuthors = context
+                .Authors
+                .Where(a => a.FirstName.EndsWith(input))
+                .Select(a => new
+                {
+                    a.FirstName,
+                    a.LastName
+                })
+                .OrderBy(a => a.FirstName)
+                .ThenBy(a => a.LastName)
+                .ToArray();
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach(var author in selectedAuthors)
+            {
+                sb.AppendLine($"{author.FirstName} {author.LastName}");
             }
 
-            
             return sb.ToString().TrimEnd();
         }
     }
