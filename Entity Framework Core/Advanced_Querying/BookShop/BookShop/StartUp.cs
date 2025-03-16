@@ -3,6 +3,7 @@
     using BookShop.Models.Enums;
     using Data;
     using Initializer;
+    using Microsoft.EntityFrameworkCore;
     using System.Text;
 
     public class StartUp
@@ -12,7 +13,9 @@
             using BookShopContext dbContext = new BookShopContext();
             //DbInitializer.ResetDatabase(db);
 
-            string result = GetBooksNotReleasedIn(dbContext, 2000);
+            string input = Console.ReadLine();
+
+            string result = GetBooksByCategory(dbContext, input);
             Console.WriteLine(result);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -76,6 +79,22 @@
                 .ToList();
 
             return string.Join(Environment.NewLine, booksNotReleasedIn);
+        }
+
+        public static string GetBooksByCategory(BookShopContext context, string input)
+        {
+            string[] categories = input
+                .ToLower()
+                .Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            var booksByCategory = context
+                .Books
+                .Where(b => b.BookCategories.Any(c => categories.Contains(c.Category.Name.ToLower())))
+                .Select(b => b.Title)
+                .OrderBy(b => b)
+                .ToArray();
+
+            return string.Join(Environment.NewLine,booksByCategory);
         }
     }
  }
