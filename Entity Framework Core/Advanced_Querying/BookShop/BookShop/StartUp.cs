@@ -13,8 +13,8 @@
             using BookShopContext dbContext = new BookShopContext();
             //DbInitializer.ResetDatabase(dbContext);
 
-            string input = "R";
-            string result = GetBooksByAuthor(dbContext, input);
+            int input = 12;
+            int result = CountBooks(dbContext, input);
 
             Console.WriteLine(result);
         }
@@ -184,6 +184,17 @@
             }
 
             return sb.ToString().TrimEnd();
+        }
+
+        public static int CountBooks(BookShopContext context, int lengthCheck)
+        {
+            var booksWithLongNames = context
+                .Books
+                .Where(b => b.Title.Length > lengthCheck)
+                .Select(b => b.BookId)
+                .ToArray();
+
+            return booksWithLongNames.Length;
         }
     }
  }
