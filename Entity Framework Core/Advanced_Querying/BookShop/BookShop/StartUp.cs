@@ -1,11 +1,9 @@
 ﻿namespace BookShop
 {
+    using BookShop.Models;
     using BookShop.Models.Enums;
     using Data;
-    using Initializer;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-    using System.Diagnostics.Metrics;
     using System.Text;
 
     public class StartUp
@@ -15,11 +13,9 @@
             using BookShopContext dbContext = new BookShopContext();
             //DbInitializer.ResetDatabase(dbContext);
 
-            //string input = "12-04-1992";
-            string input = "e";
+            string input = "R";
+            string result = GetBooksByAuthor(dbContext, input);
 
-            //string result = GetBooksReleasedBefore(dbContext, input);
-            string result = GetAuthorNamesEndingIn(dbContext, input);
             Console.WriteLine(result);
         }
         public static string GetBooksByAgeRestriction(BookShopContext context, string command)
@@ -148,6 +144,43 @@
             foreach(var author in selectedAuthors)
             {
                 sb.AppendLine($"{author.FirstName} {author.LastName}");
+            }
+
+            return sb.ToString().TrimEnd();
+        }
+
+        public static string GetBookTitlesContaining(BookShopContext context, string input)
+        {
+            var selectedBooks = context
+                .Books
+                .Where(b => b.Title.ToLower().Contains(input.ToLower()))
+                .Select(b => b.Title)
+                .OrderBy(b => b)
+                .ToArray();
+
+            return string.Join(Environment.NewLine, selectedBooks);
+        }
+
+        public static string GetBooksByAuthor(BookShopContext context, string input)
+        {
+            var selectedAuthorsBooks = context
+                .Books
+                .Where(b => b.Author.LastName.ToLower().StartsWith(input.ToLower()))
+                .Select(b => new
+                {
+                    AuthorFirstName =b.Author.FirstName,
+                    AuthorLastName = b.Author.LastName,
+                   b.Title,
+                   b.BookId
+                })
+                .OrderBy(b => b.BookId)
+                .ToArray();
+
+            StringBuilder sb = new StringBuilder();
+
+            foreach (var book in selectedAuthorsBooks)
+            {
+                sb.AppendLine($"{book.Title} ({book.AuthorFirstName} {book.AuthorLastName})");
             }
 
             return sb.ToString().TrimEnd();
