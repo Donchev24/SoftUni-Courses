@@ -13,8 +13,8 @@ namespace ProductShop
         {
             using ProductShopContext dbContext = new ProductShopContext();
 
-            string jsonString = File.ReadAllText("../../../Datasets/categories.json");
-            string result = ImportCategories(dbContext, jsonString);
+            string jsonString = File.ReadAllText("../../../Datasets/categories-products.json");
+            string result = ImportCategoryProducts(dbContext, jsonString);
 
             Console.WriteLine(result);
         }
@@ -159,6 +159,51 @@ namespace ProductShop
                 context.SaveChanges();
 
                 result = $"Successfully imported {categoriesToAdd.Count}";
+            }
+
+            return result;
+        }
+
+        public static string ImportCategoryProducts(ProductShopContext context, string inputJson)
+        {
+            string result = string.Empty;
+
+            ImportCategoriesProductsDto[]? validCategoriesProductsDtos = JsonConvert
+                .DeserializeObject<ImportCategoriesProductsDto[]>(inputJson);
+
+            if (validCategoriesProductsDtos != null)
+            {
+                ICollection<CategoryProduct> categoriesProducts = new List<CategoryProduct>();
+
+                foreach (ImportCategoriesProductsDto catProdDto in validCategoriesProductsDtos)
+                {
+                    if (!IsValid(catProdDto))
+                    {
+                        continue;
+                    }
+
+                    bool isCatIdValid = int
+                        .TryParse(catProdDto.CategoryId, out int categoryId);
+                    bool isProdIdValid = int
+                        .TryParse(catProdDto.ProductId, out int productId);
+
+                    if ((!isCatIdValid) || (!isProdIdValid))
+                    {
+                        continue;
+                    }
+
+                    CategoryProduct categoryProduct = new CategoryProduct()
+                    {
+                        CategoryId = categoryId,
+                        ProductId = productId,
+                    };
+
+                    categoriesProducts.Add(categoryProduct);
+                }
+
+                context.AddRange(categoriesProducts);
+                context.SaveChanges();
+                result = $"Successfully imported {categoriesProducts.Count}";
             }
 
             return result;
