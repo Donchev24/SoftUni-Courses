@@ -31,6 +31,8 @@
                 optionsBuilder
                     .UseSqlServer(Configuration.ConnectionString);
             }
+
+            optionsBuilder.EnableSensitiveDataLogging();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

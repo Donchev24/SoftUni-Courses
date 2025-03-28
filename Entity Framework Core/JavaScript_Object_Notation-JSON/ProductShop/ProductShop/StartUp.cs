@@ -12,8 +12,8 @@ namespace ProductShop
         {
             using ProductShopContext dbContext = new ProductShopContext();
 
-            string jsonString = File.ReadAllText("../../../Datasets/users.json");
-            string result = ImportUsers(dbContext, jsonString);
+            string jsonString = File.ReadAllText("../../../Datasets/products.json");
+            string result = ImportProducts(dbContext, jsonString);
 
             Console.WriteLine(result);
         }
@@ -62,6 +62,67 @@ namespace ProductShop
                 context.SaveChanges();
 
                 result = $"Successfully imported {usersToAdd.Count}";
+            }
+
+            return result;
+        }
+
+        public static string ImportProducts(ProductShopContext context, string inputJson)
+        {
+            string result = string.Empty;
+
+            ImportProductDto[]? productDtos = JsonConvert
+                .DeserializeObject<ImportProductDto[]>(inputJson);
+
+            if (productDtos != null)
+            {
+                ICollection<Product> productsToAdd = new List<Product>();
+
+                foreach (ImportProductDto productDto in productDtos)
+                {
+                    if (!IsValid(productDto))
+                    {
+                        continue;
+                    }
+
+                    bool isPriceValid = decimal
+                        .TryParse(productDto.Price, out decimal parsedPrice);
+                    bool isSellerIdValid = int
+                        .TryParse(productDto.SellerId, out int parsedSellerId);
+
+                    if ((!isPriceValid) || (!isSellerIdValid))
+                    {
+                        continue;
+                    }
+
+                    int? buyerId = null;
+                    if (productDto.BuyerId != null)
+                    {
+                        bool buyerIdValid = int .TryParse(productDto.BuyerId, out int parsedBuyerId);
+
+                        if (!buyerIdValid)
+                        {
+                            continue;
+                        }
+
+                        buyerId = parsedBuyerId;
+                    }
+
+                    Product product = new Product()
+                    {
+                        Name = productDto.Name,
+                        Price = parsedPrice,
+                        SellerId = parsedSellerId,
+                        BuyerId = buyerId
+                    };
+
+                    productsToAdd.Add(product);
+                }
+
+                context.AddRange(productsToAdd);
+                context.SaveChanges();
+
+                result = $"Successfully imported {productsToAdd.Count}";
             }
 
             return result;
