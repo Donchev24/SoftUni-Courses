@@ -3,6 +3,7 @@ using ProductShop.Data;
 using ProductShop.DTOs.Import;
 using ProductShop.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace ProductShop
 {
@@ -12,8 +13,8 @@ namespace ProductShop
         {
             using ProductShopContext dbContext = new ProductShopContext();
 
-            string jsonString = File.ReadAllText("../../../Datasets/products.json");
-            string result = ImportProducts(dbContext, jsonString);
+            string jsonString = File.ReadAllText("../../../Datasets/categories.json");
+            string result = ImportCategories(dbContext, jsonString);
 
             Console.WriteLine(result);
         }
@@ -123,6 +124,41 @@ namespace ProductShop
                 context.SaveChanges();
 
                 result = $"Successfully imported {productsToAdd.Count}";
+            }
+
+            return result;
+        }
+
+        public static string ImportCategories(ProductShopContext context, string inputJson)
+        {
+            string result = string.Empty;
+
+            ImportCategoryDto[]? categoryDtos = JsonConvert
+                .DeserializeObject<ImportCategoryDto[]>(inputJson);
+
+            if (categoryDtos != null)
+            {
+                ICollection<Category> categoriesToAdd = new List<Category>();
+
+                foreach (ImportCategoryDto categoryDto in categoryDtos)
+                {
+                    if (!IsValid(categoryDto))
+                    {
+                        continue;
+                    }
+
+                    Category category = new Category()
+                    {
+                        Name = categoryDto.Name,
+                    };
+
+                    categoriesToAdd.Add(category);
+                }
+
+                context.AddRange(categoriesToAdd);
+                context.SaveChanges();
+
+                result = $"Successfully imported {categoriesToAdd.Count}";
             }
 
             return result;
