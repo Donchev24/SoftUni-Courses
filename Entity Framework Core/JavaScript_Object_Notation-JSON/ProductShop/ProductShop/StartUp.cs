@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using ProductShop.Data;
 using ProductShop.DTOs.Import;
 using ProductShop.Models;
@@ -14,7 +15,7 @@ namespace ProductShop
             using ProductShopContext dbContext = new ProductShopContext();
 
             string jsonString = File.ReadAllText("../../../Datasets/categories-products.json");
-            string result = ImportCategoryProducts(dbContext, jsonString);
+            string result = GetSoldProducts(dbContext);
 
             Console.WriteLine(result);
         }
@@ -207,6 +208,72 @@ namespace ProductShop
             }
 
             return result;
+        }
+
+        public static string GetProductsInRange(ProductShopContext context)
+        {
+            var products = context
+                .Products
+                .Where(p => p.Price >= 500 && p.Price <= 1000)
+                .Select(p => new
+                {
+                    p.Name,
+                    p.Price,
+                    Seller = p.Seller.FirstName + " " + p.Seller.LastName
+                })
+                .OrderBy(p => p.Price)
+                .ToArray();
+
+            DefaultContractResolver camelCaseContractResolver = new DefaultContractResolver()
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+
+            string jsonResult = JsonConvert
+                .SerializeObject(products, Formatting.Indented, new JsonSerializerSettings()
+                {
+                    ContractResolver = camelCaseContractResolver
+                });
+
+            return jsonResult;
+        }
+
+        public static string GetSoldProducts(ProductShopContext context)
+        {
+            var usersWithSoldProducts = context
+                .Users
+                .Where(u => u.ProductsSold.Any(p => p.BuyerId.HasValue))
+                .Select(u => new
+                {
+                    u.FirstName,
+                    u.LastName,
+                    SoldProducts = u.ProductsSold
+                      .Where(p => p.BuyerId.HasValue)
+                      .Select(p => new
+                      {
+                          p.Name,
+                          p.Price,
+                          BuyerFirstName = p.Buyer!.FirstName,
+                          BuyerLastName = p.Buyer!.LastName
+                      })
+                      .ToArray()
+                })
+                .OrderBy(u => u.LastName)
+                .ThenBy(u => u.FirstName)
+                .ToArray();
+
+            DefaultContractResolver camelCaseContractResolver = new DefaultContractResolver()
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+
+            string jsonResult = JsonConvert
+                .SerializeObject(usersWithSoldProducts, Formatting.Indented, new JsonSerializerSettings()
+                {
+                    ContractResolver = camelCaseContractResolver
+                });
+
+            return jsonResult;
         }
 
         public static bool IsValid(object dto)
