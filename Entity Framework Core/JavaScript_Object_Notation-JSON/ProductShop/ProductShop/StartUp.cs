@@ -15,7 +15,7 @@ namespace ProductShop
             using ProductShopContext dbContext = new ProductShopContext();
 
             string jsonString = File.ReadAllText("../../../Datasets/categories-products.json");
-            string result = GetSoldProducts(dbContext);
+            string result = GetUsersWithProducts(dbContext);
 
             Console.WriteLine(result);
         }
@@ -271,6 +271,56 @@ namespace ProductShop
                 .SerializeObject(usersWithSoldProducts, Formatting.Indented, new JsonSerializerSettings()
                 {
                     ContractResolver = camelCaseContractResolver
+                });
+
+            return jsonResult;
+        }
+
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            var usersWithSoldProducts = context
+                .Users
+                .Where(u => u.ProductsSold.Any(p => p.BuyerId.HasValue))
+                .Select(u => new
+                {
+                    u.FirstName,
+                    u.LastName,
+                    u.Age,
+                    SoldProducts = new
+                    {
+                        Count = u.ProductsSold
+                           .Where(p => p.BuyerId.HasValue)
+                           .Count(),
+                        Products = u.ProductsSold
+                           .Where(p => p.BuyerId.HasValue)
+                           .Select(p => new
+                           {
+                               p.Name,
+                               p.Price
+                           })
+                           .ToArray()
+                    }
+                })
+                .ToArray()
+                .OrderByDescending(u => u.SoldProducts.Count)
+                .ToArray();
+
+            var userDto = new
+            {
+                UsersCount = usersWithSoldProducts.Length,
+                Users = usersWithSoldProducts
+            };
+
+            DefaultContractResolver camelCaseResolver = new DefaultContractResolver()
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+
+            string jsonResult = JsonConvert
+                .SerializeObject(userDto, Formatting.Indented, new JsonSerializerSettings()
+                {
+                    ContractResolver = camelCaseResolver,
+                    NullValueHandling = NullValueHandling.Ignore
                 });
 
             return jsonResult;
