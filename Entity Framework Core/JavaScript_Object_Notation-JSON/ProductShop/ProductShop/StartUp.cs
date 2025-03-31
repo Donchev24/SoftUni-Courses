@@ -15,7 +15,7 @@ namespace ProductShop
             using ProductShopContext dbContext = new ProductShopContext();
 
             string jsonString = File.ReadAllText("../../../Datasets/categories-products.json");
-            string result = GetUsersWithProducts(dbContext);
+            string result = GetCategoriesByProductsCount(dbContext);
 
             Console.WriteLine(result);
         }
@@ -321,6 +321,35 @@ namespace ProductShop
                 {
                     ContractResolver = camelCaseResolver,
                     NullValueHandling = NullValueHandling.Ignore
+                });
+
+            return jsonResult;
+        }
+
+        public static string GetCategoriesByProductsCount(ProductShopContext context)
+        {
+            var categories = context
+                .Categories
+                .Select(c => new
+                {
+                    Category = c.Name,
+                    ProductsCount = c.CategoriesProducts.Count(),
+                    AveragePrice = c.CategoriesProducts.Average(cp => cp.Product.Price).ToString("F2"),
+                    TotalRevenue = c.CategoriesProducts.Sum(cp => cp.Product.Price).ToString("F2")
+
+                })
+                .OrderByDescending(c => c.ProductsCount)
+                .ToArray();
+
+            DefaultContractResolver camelCaseResolver = new DefaultContractResolver()
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+
+            string jsonResult = JsonConvert
+                .SerializeObject(categories, Formatting.Indented, new JsonSerializerSettings()
+                {
+                    ContractResolver = camelCaseResolver
                 });
 
             return jsonResult;
