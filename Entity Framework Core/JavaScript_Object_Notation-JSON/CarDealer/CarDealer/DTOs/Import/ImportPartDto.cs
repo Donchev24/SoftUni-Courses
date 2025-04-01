@@ -7,13 +7,18 @@ using System.Threading.Tasks;
 
 namespace CarDealer.DTOs.Import
 {
-    public class ImportSupplierDto
+    public class ImportPartDto
     {
         [Required]
         public string Name { get; set; } = null!;
 
         [Required]
-        public string isImporter { get; set; } = null!;
+        public string Price { get; set; } = null!;
 
+        [Required]
+        public string Quantity { get; set; } = null!;
+
+        [Required]
+        public string SupplierId { get; set; } = null!;
     }
 }
