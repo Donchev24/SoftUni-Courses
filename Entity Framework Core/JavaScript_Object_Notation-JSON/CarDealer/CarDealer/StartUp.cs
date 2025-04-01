@@ -13,9 +13,9 @@ namespace CarDealer
         {
             CarDealerContext dbContext = new CarDealerContext();
 
-            string inputJson = File.ReadAllText("../../../Datasets/parts.json");
+            string inputJson = File.ReadAllText("../../../Datasets/cars.json");
 
-            string result = ImportParts(dbContext, inputJson);
+            string result = ImportCars(dbContext, inputJson);
 
             Console.WriteLine(result);
         }
@@ -117,6 +117,64 @@ namespace CarDealer
             return result; 
         }
 
+        public static string ImportCars(CarDealerContext context, string inputJson)
+        {
+            string result = string.Empty;
+
+            ICollection<Car> cars = new List<Car>();
+
+            ImportCarDto[]? carDtos = JsonConvert
+                .DeserializeObject<ImportCarDto[]>(inputJson);
+
+            if (carDtos != null)
+            {
+                foreach (ImportCarDto carDto in carDtos)
+                {
+                    if (!IsValid(carDto))
+                    {
+                        continue;
+                    }
+
+                    bool isTravelledDistanceValid = int.TryParse(carDto.TraveledDistance, out int parcedDistance);
+
+                    if (!isTravelledDistanceValid)
+                    {
+                        continue;
+                    }
+
+                    ICollection<int> partIds = new List<int>();
+
+                    if (carDto.PartsId == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (string id in carDto.PartsId)
+                    {
+                        bool isIdValid = int.TryParse(id, out int parsedId);
+                        if (isIdValid)
+                        {
+                            partIds.Add(parsedId);
+                        }
+                    }
+
+                    Car car = new Car()
+                    {
+                        Make = carDto.Make,
+                        Model = carDto.Model,
+                        TraveledDistance = parcedDistance,
+                        PartIds = partIds
+                    };
+
+                    cars.Add(car);
+                }
+                //ADD TO CONTEXT
+                //SAVE CHANGES
+
+                result = $"Successfully imported {cars.Count}.";
+            }
+            return result;
+        }
 
         public static bool IsValid(object dto)
         {
