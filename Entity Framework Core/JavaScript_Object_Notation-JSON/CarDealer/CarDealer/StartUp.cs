@@ -13,9 +13,9 @@ namespace CarDealer
         {
             CarDealerContext dbContext = new CarDealerContext();
 
-            string inputJson = File.ReadAllText("../../../Datasets/customers.json");
+            string inputJson = File.ReadAllText("../../../Datasets/sales.json");
 
-            string result = ImportCustomers(dbContext, inputJson);
+            string result = ImportSales(dbContext, inputJson);
 
             Console.WriteLine(result);
         }
@@ -229,6 +229,49 @@ namespace CarDealer
                 context.AddRange(customers);
                 context.SaveChanges();
                 result = $"Successfully imported {customers.Count}.";
+            }
+            return result;
+        }
+
+        public static string ImportSales(CarDealerContext context, string inputJson)
+        {
+            string result = string.Empty;
+            ICollection<Sale> sales = new List<Sale>();
+
+            ImportSaleDto[]? saleDtos = JsonConvert
+                .DeserializeObject<ImportSaleDto[]>(inputJson);
+
+            if (saleDtos != null)
+            {
+                foreach (ImportSaleDto saleDto in saleDtos)
+                {
+                    if (!IsValid(saleDto))
+                    {
+                        continue;
+                    }
+
+                    bool isCarIdValid = int.TryParse(saleDto.CarId, out int parsedCarId);
+                    bool isCustomerIdValid = int.TryParse(saleDto.CustomerId, out int parsedCustomerId);
+                    bool isDiscountValid = int.TryParse(saleDto.Discount, out int parsedDiscount);
+
+                    if ((!isCarIdValid) || (!isCustomerIdValid) || (!isDiscountValid))
+                    {
+                        continue;
+                    }
+
+                    Sale sale = new Sale()
+                    {
+                        CarId = parsedCarId,
+                        CustomerId = parsedCustomerId,
+                        Discount = parsedDiscount
+                    };
+
+                    sales.Add(sale);
+                }
+
+                context.AddRange(sales);
+                context.SaveChanges();
+                result = $"Successfully imported {sales.Count}.";
             }
             return result;
         }
