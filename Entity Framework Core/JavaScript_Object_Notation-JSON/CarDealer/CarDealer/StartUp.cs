@@ -13,9 +13,9 @@ namespace CarDealer
         {
             CarDealerContext dbContext = new CarDealerContext();
 
-            string inputJson = File.ReadAllText("../../../Datasets/cars.json");
+            string inputJson = File.ReadAllText("../../../Datasets/customers.json");
 
-            string result = ImportCars(dbContext, inputJson);
+            string result = ImportCustomers(dbContext, inputJson);
 
             Console.WriteLine(result);
         }
@@ -182,6 +182,53 @@ namespace CarDealer
                 context.SaveChanges();
 
                 result = $"Successfully imported {cars.Count}.";
+            }
+            return result;
+        }
+
+        public static string ImportCustomers(CarDealerContext context, string inputJson)
+        {
+            string result = string.Empty;
+
+            ICollection<Customer> customers = new List<Customer>();
+
+            ImportCustomerDto[]? customerDtos = JsonConvert
+                .DeserializeObject<ImportCustomerDto[]>(inputJson);
+
+            if (customerDtos != null)
+            {
+                foreach (ImportCustomerDto customerDto in customerDtos)
+                {
+                    if (!IsValid(customerDto))
+                    {
+                        continue;
+                    }
+
+                    bool isBirthDateValid = DateTime.TryParse(customerDto.BirthDate, out  DateTime BirthDate);
+                    if (!isBirthDateValid)
+                    {
+                        continue;
+                    }
+
+                    bool isYoungDriver = false;
+                    if (customerDto.IsYoungDriver == "true")
+                    {
+                        isYoungDriver = true;
+                    }
+
+                    Customer customer = new Customer
+                    {
+                        Name = customerDto.Name,
+                        BirthDate = BirthDate,
+                        IsYoungDriver = isYoungDriver
+                    };
+
+                    customers.Add(customer);
+                }
+
+                context.AddRange(customers);
+                context.SaveChanges();
+                result = $"Successfully imported {customers.Count}.";
             }
             return result;
         }
