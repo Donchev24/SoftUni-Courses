@@ -1,8 +1,10 @@
-﻿using CarDealer.Data;
+﻿using AutoMapper;
+using CarDealer.Data;
 using CarDealer.DTOs.Import;
 using CarDealer.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System.ComponentModel.DataAnnotations;
 
 namespace CarDealer
@@ -15,7 +17,7 @@ namespace CarDealer
 
             string inputJson = File.ReadAllText("../../../Datasets/sales.json");
 
-            string result = ImportSales(dbContext, inputJson);
+            string result = GetOrderedCustomers(dbContext);
 
             Console.WriteLine(result);
         }
@@ -274,6 +276,25 @@ namespace CarDealer
                 result = $"Successfully imported {sales.Count}.";
             }
             return result;
+        }
+
+        public static string GetOrderedCustomers(CarDealerContext context)
+        {
+            var customersToExport = context
+                .Customers
+                .OrderBy(c => c.BirthDate)
+                .ThenBy(c => c.IsYoungDriver == false)
+                .ToArray();
+
+            DefaultContractResolver camelCaseResolver = new DefaultContractResolver()
+            {
+                NamingStrategy = new DefaultNamingStrategy()
+            };
+
+            string jsonResult = JsonConvert
+                .SerializeObject(customersToExport, Formatting.Indented);
+
+            return jsonResult;
         }
 
         public static bool IsValid(object dto)
