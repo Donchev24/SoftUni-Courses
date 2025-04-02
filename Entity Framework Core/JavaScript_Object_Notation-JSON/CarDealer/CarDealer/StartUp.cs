@@ -17,7 +17,7 @@ namespace CarDealer
 
             string inputJson = File.ReadAllText("../../../Datasets/cars.json");
 
-            string result = GetLocalSuppliers(dbContext);
+            string result = GetCarsWithTheirListOfParts(dbContext);
 
             Console.WriteLine(result);
         }
@@ -329,6 +329,43 @@ namespace CarDealer
                 .SerializeObject (suppliers, Formatting.Indented);
 
             return result;
+        }
+
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+
+            var carsWithParts = context
+                .Cars
+                .Select(c => new
+                {
+                    car = new
+                    {
+                        c.Make,
+                        c.Model,
+                        c.TraveledDistance
+                    },
+
+                    parts = c.PartsCars
+                    .Select(pc => new
+                    {
+                        pc.Part.Name,
+                        Price = pc.Part.Price.ToString("F2")
+                    })
+                    .ToArray()
+                })
+                .ToArray();
+
+            string jsonResult = JsonConvert
+                .SerializeObject(carsWithParts, Formatting.Indented);
+
+            return jsonResult;
+
+            
+                
+
+
+            
+
         }
 
         public static bool IsValid(object dto)
