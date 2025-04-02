@@ -15,9 +15,9 @@ namespace CarDealer
         {
             CarDealerContext dbContext = new CarDealerContext();
 
-            string inputJson = File.ReadAllText("../../../Datasets/sales.json");
+            string inputJson = File.ReadAllText("../../../Datasets/cars.json");
 
-            string result = GetCarsFromMakeToyota(dbContext);
+            string result = GetLocalSuppliers(dbContext);
 
             Console.WriteLine(result);
         }
@@ -310,6 +310,25 @@ namespace CarDealer
                 .SerializeObject(carsFromMakeToyota, Formatting.Indented);
 
             return jsonResult;
+        }
+
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            var suppliers = context
+                .Suppliers
+                .Where(s => s.IsImporter == false)
+                .Select(s => new
+                {
+                    s.Id,
+                    s.Name,
+                    PartsCount = s.Parts.Count
+                })
+                .ToArray();
+
+            string result = JsonConvert
+                .SerializeObject (suppliers, Formatting.Indented);
+
+            return result;
         }
 
         public static bool IsValid(object dto)
