@@ -142,12 +142,12 @@ namespace CarDealer
                         continue;
                     }
 
-                    ICollection<int> partIds = new List<int>();
-
                     if (carDto.PartsId == null)
                     {
                         continue;
                     }
+
+                    ICollection<int> partIds = new List<int>();
 
                     foreach (string id in carDto.PartsId)
                     {
@@ -163,13 +163,23 @@ namespace CarDealer
                         Make = carDto.Make,
                         Model = carDto.Model,
                         TraveledDistance = parcedDistance,
-                        PartIds = partIds
+                        PartsCars = new List<PartCar>()
                     };
+
+                    var parts = context
+                        .Parts
+                        .Where(p => partIds.Contains(p.Id))
+                        .ToArray();
+
+                    foreach (Part part in parts)
+                    {
+                        car.PartsCars.Add(new PartCar { Car = car, Part = part });
+                    }
 
                     cars.Add(car);
                 }
-                //ADD TO CONTEXT
-                //SAVE CHANGES
+                context.AddRange(cars);
+                context.SaveChanges();
 
                 result = $"Successfully imported {cars.Count}.";
             }
