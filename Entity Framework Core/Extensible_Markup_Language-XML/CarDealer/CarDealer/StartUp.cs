@@ -115,6 +115,13 @@ namespace CarDealer
             return result;
         }
 
+        public static string ImportCars(CarDealerContext context, string inputXml)
+        {
+            string result = string.Empty;
+
+
+        }
+
         public static bool IsValid(object dto)
         {
             var validateContext = new ValidationContext(dto);
