@@ -12,10 +12,10 @@ namespace CarDealer
         {
             using CarDealerContext dbContext = new CarDealerContext();
 
-            string xmlFilePath = "../../../Datasets/suppliers.xml";
+            string xmlFilePath = "../../../Datasets/parts.xml";
             string inputXml = File.ReadAllText(xmlFilePath);
 
-            string result = ImportSuppliers(dbContext, inputXml);
+            string result = ImportParts(dbContext, inputXml);
             Console.WriteLine(result);
         }
 
@@ -58,6 +58,61 @@ namespace CarDealer
                 result = $"Successfully imported {validSuppliers.Count}";
             }
             return result ;
+        }
+
+        public static string ImportParts(CarDealerContext context, string inputXml)
+        {
+            string result = string.Empty;
+
+            ICollection<Part> parts = new List<Part>();
+
+            ImportPartDto[]? partDtos = XmlHelper
+                .Deserialize<ImportPartDto[]>(inputXml, "Parts");
+
+            if (partDtos != null)
+            {
+                var validSupplierIds = context
+                        .Suppliers
+                        .Select(s => s.Id)
+                        .ToArray();
+
+                foreach (ImportPartDto partDto in partDtos)
+                {
+                    if (!IsValid(partDto))
+                    {
+                        continue;
+                    }
+
+                    bool isPriceValid = decimal.TryParse(partDto.Price, out decimal price);
+                    bool isQuantityValid = int.TryParse(partDto.Quantity, out int quantity);
+                    bool isSupplierIdValid = int.TryParse(partDto.SupplierId, out int supplierId);
+
+                    if ((!isPriceValid) || (!isQuantityValid) || (!isSupplierIdValid))
+                    {
+                        continue;
+                    }
+
+                    if (!validSupplierIds.Contains(supplierId))
+                    {
+                        continue;
+                    }
+
+                    Part part = new Part()
+                    {
+                        Name = partDto.Name,
+                        Price = price,
+                        Quantity = quantity,
+                        SupplierId = supplierId,
+                    };
+
+                    parts.Add(part);
+                }
+                context.AddRange(parts);
+                context.SaveChanges();
+
+                result = $"Successfully imported {parts.Count}";
+            }
+            return result;
         }
 
         public static bool IsValid(object dto)
