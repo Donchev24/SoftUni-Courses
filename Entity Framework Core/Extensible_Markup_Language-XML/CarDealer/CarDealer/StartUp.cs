@@ -12,10 +12,10 @@ namespace CarDealer
         {
             using CarDealerContext dbContext = new CarDealerContext();
 
-            string xmlFilePath = "../../../Datasets/parts.xml";
+            string xmlFilePath = "../../../Datasets/cars.xml";
             string inputXml = File.ReadAllText(xmlFilePath);
 
-            string result = ImportParts(dbContext, inputXml);
+            string result = ImportCars(dbContext, inputXml);
             Console.WriteLine(result);
         }
 
@@ -119,7 +119,69 @@ namespace CarDealer
         {
             string result = string.Empty;
 
+            ICollection<Car> cars = new List<Car>();
 
+            ImportCarDto[]? carDtos = XmlHelper
+                .Deserialize<ImportCarDto[]>(inputXml, "Cars");
+
+            if (carDtos != null)
+            {
+                foreach (ImportCarDto carDto in carDtos)
+                {
+                    if (!IsValid(carDto))
+                    {
+                        continue;
+                    }
+
+                    bool isDistanceValid = long.TryParse(carDto.TraveledDistance, out long traveledDistance);
+                    if (!isDistanceValid)
+                    {
+                        continue;
+                    }
+
+                    List<int> partIds = new List<int>();
+                    foreach (ImportCarPartsDto id in carDto.Parts)
+                    {
+                        bool isPartIdValid = int.TryParse(id.Id, out int parsedId);
+
+                        if (isPartIdValid)
+                        {
+                            partIds.Add(parsedId);
+                        }
+                    }
+
+                    Car car = new Car()
+                    {
+                        Make = carDto.Make,
+                        Model = carDto.Model,
+                        TraveledDistance = traveledDistance,
+                        PartsCars = new List<PartCar>()
+                    };
+
+                    Part[] parts = context
+                        .Parts
+                        .Where(p => partIds.Contains(p.Id))
+                        .Distinct()
+                        .ToArray();
+
+                    foreach (Part part in parts)
+                    {
+                        car.PartsCars.Add(new PartCar
+                        {
+                            Car = car,
+                            Part = part
+                        });
+                    }
+
+                    cars.Add(car);
+                }
+
+                context.AddRange(cars);
+                context.SaveChanges();
+                result = $"Successfully imported {cars.Count}";
+            }
+            
+            return result;
         }
 
         public static bool IsValid(object dto)
