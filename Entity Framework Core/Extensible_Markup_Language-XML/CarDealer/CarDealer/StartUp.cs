@@ -13,10 +13,10 @@ namespace CarDealer
         {
             using CarDealerContext dbContext = new CarDealerContext();
 
-            string xmlFilePath = "../../../Datasets/customers.xml";
+            string xmlFilePath = "../../../Datasets/sales.xml";
             string inputXml = File.ReadAllText(xmlFilePath);
 
-            string result = ImportCustomers(dbContext, inputXml);
+            string result = ImportSales(dbContext, inputXml);
             Console.WriteLine(result);
         }
 
@@ -229,6 +229,61 @@ namespace CarDealer
                 context.Customers.AddRange(customers);
                 context.SaveChanges();
                 result = $"Successfully imported {customers.Count}";
+            }
+
+            return result;
+        }
+
+        public static string ImportSales(CarDealerContext context, string inputXml)
+        {
+            string result = string.Empty;
+
+            int[] validCarIds = context
+                .Cars
+                .Select(c => c.Id)
+                .ToArray();
+
+            ICollection<Sale> sales = new List<Sale>();
+
+            ImportSaleDto[]? saleDtos = XmlHelper
+                .Deserialize<ImportSaleDto[]>(inputXml, "Sales");
+
+            if (saleDtos != null)
+            {
+                foreach (ImportSaleDto saleDto in saleDtos)
+                {
+                    if (!IsValid(saleDto))
+                    {
+                        continue;
+                    }
+
+                    bool isCarIdValid = int.TryParse(saleDto.CarId, out int parsedCarId);
+                    bool isCustomerIdValid = int.TryParse(saleDto.CustomerId, out int parsedCustomerId);
+                    bool isDiscountValid = int.TryParse(saleDto.Discount, out int parsedDiscount);
+
+                    if ((!isCarIdValid) || (!isCustomerIdValid) || (!isDiscountValid))
+                    {
+                        continue;
+                    }
+
+                    if (!validCarIds.Contains(parsedCarId))
+                    {
+                        continue;
+                    }
+
+                    Sale sale = new Sale()
+                    {
+                        CarId = parsedCarId,
+                        CustomerId = parsedCustomerId,
+                        Discount = parsedDiscount
+                    };
+
+                    sales.Add(sale);
+                }
+
+                context.Sales.AddRange(sales);
+                context.SaveChanges();
+                result = $"Successfully imported {sales.Count}";
             }
 
             return result;
