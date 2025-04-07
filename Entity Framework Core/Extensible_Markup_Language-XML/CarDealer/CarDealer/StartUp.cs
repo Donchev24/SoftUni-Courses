@@ -3,6 +3,7 @@ using CarDealer.DTOs.Import;
 using CarDealer.Models;
 using CarDealer.Utilities;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace CarDealer
 {
@@ -12,10 +13,10 @@ namespace CarDealer
         {
             using CarDealerContext dbContext = new CarDealerContext();
 
-            string xmlFilePath = "../../../Datasets/cars.xml";
+            string xmlFilePath = "../../../Datasets/customers.xml";
             string inputXml = File.ReadAllText(xmlFilePath);
 
-            string result = ImportCars(dbContext, inputXml);
+            string result = ImportCustomers(dbContext, inputXml);
             Console.WriteLine(result);
         }
 
@@ -181,6 +182,55 @@ namespace CarDealer
                 result = $"Successfully imported {cars.Count}";
             }
             
+            return result;
+        }
+
+        public static string ImportCustomers(CarDealerContext context, string inputXml)
+        {
+            string result = string.Empty;
+
+            ICollection<Customer> customers = new List<Customer>();
+
+            ImportCustomerDto[]? customerDtos = XmlHelper
+                .Deserialize<ImportCustomerDto[]>(inputXml, "Customers");
+
+            if (customerDtos != null)
+            {
+                foreach (ImportCustomerDto customerDto in customerDtos)
+                {
+                    if (!IsValid(customerDto))
+                    {
+                        continue;
+                    }
+
+                    bool isBirthDateValid = DateTime.TryParse(customerDto.BirthDate,
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out DateTime parsedBirthDate);
+
+                    if (!isBirthDateValid)
+                    {
+                        continue;
+                    }
+
+                    bool isYoungDriverValid = bool.TryParse(customerDto.IsYoungDriver, out bool isYoungDriver);
+
+
+                    Customer customer = new Customer()
+                    {
+                        Name = customerDto.Name,
+                        BirthDate = parsedBirthDate,
+                        IsYoungDriver = isYoungDriver
+                    };
+
+                    customers.Add(customer);
+                }
+
+                context.Customers.AddRange(customers);
+                context.SaveChanges();
+                result = $"Successfully imported {customers.Count}";
+            }
+
             return result;
         }
 
