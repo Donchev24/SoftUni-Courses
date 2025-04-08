@@ -5,6 +5,7 @@ using CarDealer.Models;
 using CarDealer.Utilities;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.IO;
 
 namespace CarDealer
 {
@@ -19,7 +20,7 @@ namespace CarDealer
 
             //string result = ImportSales(dbContext, inputXml);
 
-            string result = GetLocalSuppliers(dbContext);
+            string result = GetCarsWithTheirListOfParts(dbContext);
             Console.WriteLine(result);
         }
 
@@ -357,7 +358,36 @@ namespace CarDealer
 
             return result;
         }
-                
+
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            ExportCarsWithTheirListOfPartsDto[] carsWithTheirListOfParts = context
+                .Cars
+                .OrderByDescending(c => c.TraveledDistance)
+                .ThenBy(c => c.Model)
+                .Select(c => new ExportCarsWithTheirListOfPartsDto
+                {
+                    Make = c.Make,
+                    Model = c.Model,
+                    TraveledDistance = c.TraveledDistance.ToString(),
+                    Parts = c.PartsCars
+                    .Select(p => p.Part)
+                    .OrderByDescending(p => p.Price)
+                    .Select(p => new ExportCarsWithTheirListOfPartsPartDto
+                    {
+                        Name = p.Name,
+                        Price = p.Price.ToString()
+                    })
+                    .ToArray()
+                })
+                .Take(5)
+                .ToArray();
+
+            string result = XmlHelper
+                .Serialize(carsWithTheirListOfParts, "cars");
+            return result;
+        }
+
 
 
         // VALIDATION !!!
