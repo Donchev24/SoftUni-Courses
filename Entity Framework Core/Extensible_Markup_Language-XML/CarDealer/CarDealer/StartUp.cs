@@ -1,4 +1,5 @@
 ﻿using CarDealer.Data;
+using CarDealer.DTOs.Export;
 using CarDealer.DTOs.Import;
 using CarDealer.Models;
 using CarDealer.Utilities;
@@ -13,10 +14,12 @@ namespace CarDealer
         {
             using CarDealerContext dbContext = new CarDealerContext();
 
-            string xmlFilePath = "../../../Datasets/sales.xml";
-            string inputXml = File.ReadAllText(xmlFilePath);
+            //string xmlFilePath = "../../../Datasets/sales.xml";
+            //string inputXml = File.ReadAllText(xmlFilePath);
 
-            string result = ImportSales(dbContext, inputXml);
+            //string result = ImportSales(dbContext, inputXml);
+
+            string result = GetCarsWithDistance(dbContext);
             Console.WriteLine(result);
         }
 
@@ -289,6 +292,36 @@ namespace CarDealer
             return result;
         }
 
+
+        // EXPORT !!!
+
+
+        public static string GetCarsWithDistance(CarDealerContext context)
+        {
+            ExportCarsWithDistanceDto[] carsWithDistance = context
+                .Cars
+                .Where(c => c.TraveledDistance > 2_000_000)
+                .Select(c => new ExportCarsWithDistanceDto
+                {
+                    Make = c.Make,
+                    Model = c.Model,
+                    TraveledDistance = c.TraveledDistance.ToString()
+                })
+                .OrderBy(c => c.Make)
+                .ThenBy(c => c.Model)
+                .Take(10)
+                .ToArray();
+
+            string result = XmlHelper
+                .Serialize(carsWithDistance, "cars");
+
+            return result;
+        }
+
+
+        // VALIDATION !!!
+
+
         public static bool IsValid(object dto)
         {
             var validateContext = new ValidationContext(dto);
@@ -299,7 +332,5 @@ namespace CarDealer
 
             return isValid;
         }
-
-
     }
 }
