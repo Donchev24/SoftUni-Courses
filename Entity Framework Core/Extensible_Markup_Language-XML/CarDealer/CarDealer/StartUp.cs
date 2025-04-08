@@ -19,7 +19,7 @@ namespace CarDealer
 
             //string result = ImportSales(dbContext, inputXml);
 
-            string result = GetCarsFromMakeBmw(dbContext);
+            string result = GetLocalSuppliers(dbContext);
             Console.WriteLine(result);
         }
 
@@ -338,6 +338,26 @@ namespace CarDealer
 
             return result;
         }
+
+        public static string GetLocalSuppliers(CarDealerContext context)
+        {
+            ExportLocalSuppliersDto[] localSuppliersDtos = context
+                .Suppliers
+                .Where(s => s.IsImporter == false)
+                .Select(s => new ExportLocalSuppliersDto
+                {
+                    Id = s.Id.ToString(),
+                    Name = s.Name,
+                    PartsCount = s.Parts.Count.ToString(),
+                })
+                .ToArray();
+
+            string result = XmlHelper
+                .Serialize(localSuppliersDtos, "suppliers");
+
+            return result;
+        }
+                
 
 
         // VALIDATION !!!
