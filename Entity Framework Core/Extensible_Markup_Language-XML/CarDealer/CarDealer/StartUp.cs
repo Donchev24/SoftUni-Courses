@@ -19,7 +19,7 @@ namespace CarDealer
 
             //string result = ImportSales(dbContext, inputXml);
 
-            string result = GetCarsWithDistance(dbContext);
+            string result = GetCarsFromMakeBmw(dbContext);
             Console.WriteLine(result);
         }
 
@@ -314,6 +314,27 @@ namespace CarDealer
 
             string result = XmlHelper
                 .Serialize(carsWithDistance, "cars");
+
+            return result;
+        }
+
+        public static string GetCarsFromMakeBmw(CarDealerContext context)
+        {
+            ExportCarsFromMakeBmwDto[] carsFromMakeBmwDtos = context
+                .Cars
+                .Where(c => c.Make == "BMW")
+                .OrderBy(c => c.Model)
+                .ThenByDescending(c => c.TraveledDistance)
+                .Select(c => new ExportCarsFromMakeBmwDto
+                {
+                    Id = c.Id.ToString(),
+                    Model = c.Model,
+                    TraveledDistance = c.TraveledDistance.ToString(),
+                })
+                .ToArray();
+
+            string result = XmlHelper
+                .Serialize(carsFromMakeBmwDtos, "cars");
 
             return result;
         }
