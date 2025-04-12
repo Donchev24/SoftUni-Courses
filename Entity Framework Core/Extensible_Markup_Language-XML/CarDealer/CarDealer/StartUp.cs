@@ -20,7 +20,7 @@ namespace CarDealer
 
             //string result = ImportSales(dbContext, inputXml);
 
-            string result = GetCarsWithTheirListOfParts(dbContext);
+            string result = GetTotalSalesByCustomer(dbContext);
             Console.WriteLine(result);
         }
 
@@ -294,6 +294,9 @@ namespace CarDealer
         }
 
 
+ 
+
+
         // EXPORT !!!
 
 
@@ -386,6 +389,35 @@ namespace CarDealer
             string result = XmlHelper
                 .Serialize(carsWithTheirListOfParts, "cars");
             return result;
+        }
+
+        //Not Finished
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            ExportCustomerTotalSalesDto[] customerSalesDtos = context
+                .Customers
+                .Where(c => c.Sales.Count() > 0)
+                .Select(c => new ExportCustomerTotalSalesDto
+                {
+                    FullName = c.Name,
+                    BoughtCars = c.Sales.Count().ToString(),
+                    SpentMoney = c.Sales
+                                 .Sum(s => s.Car
+                                 .PartsCars
+                                 .Sum(p => p.Part.Price) * (1 - ((s.Discount + (c.IsYoungDriver ? 5 : 0)) / 100m)))
+                                 .ToString()
+
+                })
+                .OrderByDescending(c => c.SpentMoney)
+                .ToArray();
+
+            string result = XmlHelper
+                .Serialize(customerSalesDtos, "customers");
+            return result;
+
+            // Not Finished
+
+
         }
 
 
