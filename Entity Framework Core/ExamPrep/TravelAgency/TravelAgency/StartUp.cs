@@ -15,7 +15,7 @@ namespace TravelAgency
             var projectDir = GetProjectDirectory();
 
             ImportEntities(context, projectDir + @"Datasets/", projectDir + @"ImportResults/");
-            //ExportEntities(context, projectDir + @"ExportResults/");
+            ExportEntities(context, projectDir + @"ExportResults/");
 
             using (var transaction = context.Database.BeginTransaction())
             {
@@ -23,24 +23,24 @@ namespace TravelAgency
             }
         }
 
-        //private static void ExportEntities(TravelAgencyContext context, string exportDir)
-        //{
-        //    var GuidesWithSpanishLanguageWithAllTheirTourPackages = DataProcessor
-        //        .Serializer.ExportGuidesWithSpanishLanguageWithAllTheirTourPackages(context);
+        private static void ExportEntities(TravelAgencyContext context, string exportDir)
+        {
+            var GuidesWithSpanishLanguageWithAllTheirTourPackages = DataProcessor
+                .Serializer.ExportGuidesWithSpanishLanguageWithAllTheirTourPackages(context);
 
-        //    Console
-        //        .WriteLine(GuidesWithSpanishLanguageWithAllTheirTourPackages);
-        //    File
-        //        .WriteAllText(exportDir + "Actual Result - Export Guides With Spanish Language With All Their Tour Packages.xml", GuidesWithSpanishLanguageWithAllTheirTourPackages);
+            Console
+                .WriteLine(GuidesWithSpanishLanguageWithAllTheirTourPackages);
+            File
+                .WriteAllText(exportDir + "Actual Result - Export Guides With Spanish Language With All Their Tour Packages.xml", GuidesWithSpanishLanguageWithAllTheirTourPackages);
 
-        //    var CustomersThatHaveBookedHorseRidingTourPackage = DataProcessor
-        //        .Serializer.ExportCustomersThatHaveBookedHorseRidingTourPackage(context);
+            var CustomersThatHaveBookedHorseRidingTourPackage = DataProcessor
+                .Serializer.ExportCustomersThatHaveBookedHorseRidingTourPackage(context);
 
-        //    Console
-        //        .WriteLine(CustomersThatHaveBookedHorseRidingTourPackage);
-        //    File
-        //        .WriteAllText(exportDir + "Actual Result - Export Customers With Their Bookings.json", CustomersThatHaveBookedHorseRidingTourPackage);
-        //}
+            Console
+                .WriteLine(CustomersThatHaveBookedHorseRidingTourPackage);
+            File
+                .WriteAllText(exportDir + "Actual Result - Export Customers With Their Bookings.json", CustomersThatHaveBookedHorseRidingTourPackage);
+        }
 
         private static void ImportEntities(TravelAgencyContext context, string baseDir, string exportDir)
         {

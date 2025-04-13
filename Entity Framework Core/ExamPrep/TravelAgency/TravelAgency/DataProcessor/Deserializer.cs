@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Net.Http.Headers;
 using System.Text;
 using TravelAgency.Data;
@@ -65,8 +67,74 @@ namespace TravelAgency.DataProcessor
 
         public static string ImportBookings(TravelAgencyContext context, string jsonString)
         {
-            string result = string.Empty;
-            return result;
+            StringBuilder output = new StringBuilder();
+
+            ICollection<Booking> validBookings = new List<Booking>();
+
+            ImportBookingDto[]? bookingDtos = JsonConvert
+                .DeserializeObject<ImportBookingDto[]>(jsonString);
+
+            if (bookingDtos != null && bookingDtos.Length > 0)
+            {
+                foreach (ImportBookingDto bookingDto in bookingDtos)
+                {
+                    if (!IsValid(bookingDto))
+                    {
+                        output.AppendLine(ErrorMessage);
+                    }
+
+                    bool isDateValid = DateTime
+                        .TryParseExact(bookingDto.BookingDate, "yyyy-MM-dd",
+                                           CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate);
+
+                    if (!isDateValid)
+                    {
+                        output.AppendLine(ErrorMessage);
+                        continue;
+                    }
+
+                    Customer customer;
+                    TourPackage tourPackage;
+
+                    bool isCustomerExist = context
+                        .Customers
+                        .Any(c => c.FullName == bookingDto.CustomerName);
+
+                    bool isTourPackageExist = context
+                        .TourPackages
+                        .Any(tp => tp.PackageName == bookingDto.TourPackageName);
+
+                    if ((!isCustomerExist) || (!isTourPackageExist))
+                    {
+                        continue;
+                    }
+
+                    
+                    customer = context
+                            .Customers
+                            .First(c => c.FullName == bookingDto.CustomerName);
+
+                    tourPackage = context
+                        .TourPackages
+                        .First(tp => tp.PackageName == bookingDto.TourPackageName);
+                    
+                    Booking boooking = new Booking()
+                    {
+                        BookingDate = parsedDate,
+                        Customer = customer,
+                        TourPackage = tourPackage
+                    };
+
+                    validBookings.Add(boooking);
+                    string msg = String.Format(SuccessfullyImportedBooking, bookingDto.TourPackageName, parsedDate.ToString("yyyy-MM-dd"));
+                    output.AppendLine(msg);
+                }
+
+                context.Bookings.AddRange(validBookings);
+                context.SaveChanges();
+            }
+
+            return output.ToString().TrimEnd();
         }
 
         public static bool IsValid(object dto)
