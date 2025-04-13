@@ -6,12 +6,14 @@ namespace Cadastre.DataProcessor
     {
         public static string ExportPropertiesWithOwners(CadastreContext dbContext)
         {
-           throw new NotImplementedException();
+           string output = string.Empty;
+           return output;
         }
 
         public static string ExportFilteredPropertiesWithDistrict(CadastreContext dbContext)
         {
-            throw new NotImplementedException();
+            string output = string.Empty;
+            return output;
         }
     }
 }

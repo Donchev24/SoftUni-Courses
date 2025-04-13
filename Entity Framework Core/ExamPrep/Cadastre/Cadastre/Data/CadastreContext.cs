@@ -1,5 +1,6 @@
 ﻿namespace Cadastre.Data
 {
+    using Cadastre.Data.Models;
     using Microsoft.EntityFrameworkCore;
     public class CadastreContext : DbContext
     {
@@ -14,6 +15,12 @@
             
         }
 
+
+        public virtual DbSet<Citizen> Citizens { get; set; } = null!;
+        public virtual DbSet<District> Districts { get; set; } = null!;
+        public virtual DbSet<Property> Properties { get; set; } = null!;
+        public virtual DbSet<PropertyCitizen> PropertiesCitizens { get; set; } = null!;
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if(!optionsBuilder.IsConfigured)
@@ -24,6 +31,10 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<PropertyCitizen>(entity =>
+            {
+                entity.HasKey(pc => new { pc.PropertyId, pc.CitizenId });
+            });
         }
     }
 }
