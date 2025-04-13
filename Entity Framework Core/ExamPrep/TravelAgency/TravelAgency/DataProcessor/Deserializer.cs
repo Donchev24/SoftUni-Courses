@@ -10,15 +10,15 @@ namespace TravelAgency.DataProcessor
         private const string SuccessfullyImportedCustomer = "Successfully imported customer - {0}";
         private const string SuccessfullyImportedBooking = "Successfully imported booking. TourPackage: {0}, Date: {1}";
 
-        public static string ImportCustomers(TravelAgencyContext context, string xmlString)
-        {
-            throw new NotImplementedException();
-        }
+        //public static string ImportCustomers(TravelAgencyContext context, string xmlString)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public static string ImportBookings(TravelAgencyContext context, string jsonString)
-        {
-            throw new NotImplementedException();
-        }
+        //public static string ImportBookings(TravelAgencyContext context, string jsonString)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public static bool IsValid(object dto)
         {
