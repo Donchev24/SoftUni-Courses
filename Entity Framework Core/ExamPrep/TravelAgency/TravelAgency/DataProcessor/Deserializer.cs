@@ -81,6 +81,7 @@ namespace TravelAgency.DataProcessor
                     if (!IsValid(bookingDto))
                     {
                         output.AppendLine(ErrorMessage);
+                        continue;
                     }
 
                     bool isDateValid = DateTime
