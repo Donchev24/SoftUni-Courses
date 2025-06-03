@@ -1,0 +1,15 @@
+p.highlight {
+    color: rgb(46, 70, 205);
+}
+
+div#box {
+    background-color: orange;
+}
+
+p.someclass1.someclass2.someclass3 {
+    color: green;
+}
+
+a[href="https://softuni.bg"] {
+    color: pink;
+}
