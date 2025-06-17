@@ -1,0 +1,25 @@
+.highlight {
+    color: rgb(3, 152, 201);
+}
+
+#special {
+    background-color:orange;
+    padding: 0.5em;
+    
+}
+
+a[href="https://softuni.bg/"] {
+    color: rgb(250, 166, 49);
+}
+
+.class1.class2.class3 {
+    color: darkblue
+}
+
+.important-one {
+    color:aqua
+}
+
+.important-three {
+    color: red;
+}
