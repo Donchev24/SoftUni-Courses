@@ -1,0 +1,15 @@
+div p {
+color: darkblue;
+}
+
+ul > li {
+list-style-type:lower-roman;
+}
+
+p + p {
+    background-color: lightgrey;
+}
+
+span {
+    color: red;
+}
