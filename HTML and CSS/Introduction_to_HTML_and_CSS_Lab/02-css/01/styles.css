@@ -1,0 +1,31 @@
+h1 {
+    color: red;
+}
+
+p {
+    font-size: large;
+}
+
+.highlight {
+    color: green;
+}
+
+#main-title {
+    color: lightblue;
+}
+
+#special-paragraph {
+    font-style: italic;
+}
+
+ul {
+    list-style-type: square;
+}
+
+li {
+    color: red;
+}
+
+div {
+    background-color: orange;
+}
