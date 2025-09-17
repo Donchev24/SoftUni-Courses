@@ -1,0 +1,15 @@
+ul > li.unique {
+    color: red;
+}
+
+article + article > p#firstParagraph {
+    background-color: orange;
+}
+
+h2.highlight ~ p {
+    color: blue;
+}
+
+li#chosen + li > a {
+    color: green;
+}
