@@ -1,0 +1,24 @@
+p.highlighted {
+    color: lightblue;
+}
+
+div#special {
+    background-color: orange;
+}
+
+p.one,.two,.three {
+    color: blue;
+}
+
+li.important {
+    color:aquamarine;
+}
+
+li.alsoVeryImportant {
+    color: red;
+    font-style: italic;
+}
+
+.specific[href="www.softuni.com"] {
+    color: orange;
+}
