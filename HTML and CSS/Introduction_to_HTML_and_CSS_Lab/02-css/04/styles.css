@@ -1,0 +1,11 @@
+header a {
+    text-decoration: none;
+}
+
+div.special > section {
+    background-color: aqua;
+}
+
+li > a#oneOfAKind {
+    font-weight: 900;
+}
